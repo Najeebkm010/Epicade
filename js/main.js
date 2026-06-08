@@ -34,9 +34,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const cursor = document.createElement("div");
     cursor.id = "cursor";
     body.appendChild(cursor);
+
+    let cursorX = 0;
+    let cursorY = 0;
+    let cursorTicking = false;
+
     window.addEventListener("mousemove", (event) => {
-      cursor.style.left = `${event.clientX}px`;
-      cursor.style.top = `${event.clientY}px`;
+      cursorX = event.clientX;
+      cursorY = event.clientY;
+      if (!cursorTicking) {
+        window.requestAnimationFrame(() => {
+          cursor.style.left = `${cursorX}px`;
+          cursor.style.top = `${cursorY}px`;
+          cursorTicking = false;
+        });
+        cursorTicking = true;
+      }
     }, { passive: true });
   }
 
@@ -102,11 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const image = card.querySelector("img");
     if (!image) return;
 
+    let parallaxTicking = false;
+
     card.addEventListener("mousemove", (event) => {
-      const rect = card.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width - 0.5) * 16;
-      const y = ((event.clientY - rect.top) / rect.height - 0.5) * 16;
-      image.style.transform = `scale(1.04) translate(${x}px, ${y}px)`;
+      if (!parallaxTicking) {
+        window.requestAnimationFrame(() => {
+          const rect = card.getBoundingClientRect();
+          const x = ((event.clientX - rect.left) / rect.width - 0.5) * 16;
+          const y = ((event.clientY - rect.top) / rect.height - 0.5) * 16;
+          image.style.transform = `scale(1.04) translate(${x}px, ${y}px)`;
+          parallaxTicking = false;
+        });
+        parallaxTicking = true;
+      }
     });
 
     card.addEventListener("mouseleave", () => {
@@ -197,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector(".contact-form");
   const formMessage = document.querySelector(".form-message");
   if (form) {
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const email = form.querySelector('input[type="email"]');
       const requiredFields = Array.from(form.querySelectorAll("[required]"));
@@ -212,15 +233,41 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!isComplete || !isEmailValid) {
         if (formMessage) {
           formMessage.textContent = "Please complete the required fields with a valid email address.";
-          formMessage.classList.add("show");
+          formMessage.classList.add("show", "error");
         }
         return;
       }
 
-      form.reset();
-      if (formMessage) {
-        formMessage.textContent = "Thank you! We'll be in touch within 24 hours.";
-        formMessage.classList.add("show");
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.textContent;
+      submitBtn.textContent = "Sending...";
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          form.reset();
+          if (formMessage) {
+            formMessage.textContent = "Thank you! We'll be in touch within 24 hours.";
+            formMessage.classList.remove("error");
+            formMessage.classList.add("show");
+          }
+        } else {
+          throw new Error("Network response was not ok.");
+        }
+      } catch (error) {
+        if (formMessage) {
+          formMessage.textContent = "Oops! There was a problem submitting your form.";
+          formMessage.classList.add("show", "error");
+        }
+      } finally {
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
       }
     });
   }
