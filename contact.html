@@ -77,7 +77,7 @@
           </div>
         </aside>
 
-        <form class="contact-form reveal" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+        <!-- <form class="contact-form reveal" action="https://formspree.io/f/meewkkny" method="POST" novalidate>
           <div class="form-row">
             <div class="field">
               <label for="name">Full Name</label>
@@ -115,7 +115,78 @@
           <div class="form-message" role="status" aria-live="polite"></div>
         </form>
       </div>
+    </section> -->
+
+    <form class="contact-form reveal" id="contactForm" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="John Doe" required>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" name="email" placeholder="john@email.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" placeholder="+971 50 000 0000" required>
+        </div>
+        <div class="field">
+          <label>Service Interested In</label>
+          <select name="service" required>
+            <option value="">Select a service</option>
+            <option>Photography</option>
+            <option>Videography</option>
+            <option>Event Coverage</option>
+            <option>Corporate Shoots</option>
+            <option>Social Media Content</option>
+            <option>Digital Marketing</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Project Details</label>
+        <textarea name="details" placeholder="Tell us about your project..." required></textarea>
+      </div>
+      <button class="btn btn-gold" type="submit">Send Enquiry →</button>
+      <div class="form-message" role="status" aria-live="polite"></div>
+    </form>
+
+    <script>
+    document.getElementById("contactForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const btn = this.querySelector("button");
+      const msg = this.querySelector(".form-message");
+      btn.textContent = "Sending...";
+      btn.disabled = true;
+
+      fetch("https://script.google.com/macros/s/AKfycbyaSpvHIOI1bHuYhXlRVVLzk6JLxtpZecSFWhM2r8YAYIt60n1inUgfvnlT0hGuw7Bo/exec", {
+        method: "POST",
+        mode: "no-cors",
+        body: new FormData(this)
+      })
+      .then(() => {
+        msg.style.color = "#4ade80";
+        msg.textContent = "✓ Message sent! We'll be in touch within 24 hours.";
+        this.reset();
+      })
+      .catch(() => {
+        msg.style.color = "#C92940";
+        msg.textContent = "Something went wrong. Please try WhatsApp or email us directly.";
+      })
+      .finally(() => {
+        btn.textContent = "Send Enquiry →";
+        btn.disabled = false;
+      });
+    });
+    </script>
+    </div>
     </section>
+
+
 
     <section class="section compact map-wrap">
       <div class="container">
