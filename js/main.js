@@ -44,8 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cursorY = event.clientY;
       if (!cursorTicking) {
         window.requestAnimationFrame(() => {
-          cursor.style.left = `${cursorX}px`;
-          cursor.style.top = `${cursorY}px`;
+          cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
           cursorTicking = false;
         });
         cursorTicking = true;
@@ -214,63 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.key === "ArrowLeft") moveLightbox(-1);
     if (event.key === "ArrowRight") moveLightbox(1);
   });
-
-  const form = document.querySelector(".contact-form");
-  const formMessage = document.querySelector(".form-message");
-  if (form) {
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const email = form.querySelector('input[type="email"]');
-      const requiredFields = Array.from(form.querySelectorAll("[required]"));
-      const isComplete = requiredFields.every((field) => field.value.trim());
-      const isEmailValid = !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
-
-      requiredFields.forEach((field) => {
-        field.toggleAttribute("aria-invalid", !field.value.trim());
-      });
-      if (email) email.toggleAttribute("aria-invalid", !isEmailValid);
-
-      if (!isComplete || !isEmailValid) {
-        if (formMessage) {
-          formMessage.textContent = "Please complete the required fields with a valid email address.";
-          formMessage.classList.add("show", "error");
-        }
-        return;
-      }
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn.textContent;
-      submitBtn.textContent = "Sending...";
-      submitBtn.disabled = true;
-
-      try {
-        const response = await fetch(form.action, {
-          method: form.method,
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
-        });
-
-        if (response.ok) {
-          form.reset();
-          if (formMessage) {
-            formMessage.textContent = "Thank you! We'll be in touch within 24 hours.";
-            formMessage.classList.remove("error");
-            formMessage.classList.add("show");
-          }
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      } catch (error) {
-        if (formMessage) {
-          formMessage.textContent = "Oops! There was a problem submitting your form.";
-          formMessage.classList.add("show", "error");
-        }
-      } finally {
-        submitBtn.textContent = originalBtnText;
-        submitBtn.disabled = false;
-      }
-    });
-  }
 
   document.querySelectorAll('a[href$=".html"]').forEach((link) => {
     const target = link.getAttribute("target");

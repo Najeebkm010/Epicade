@@ -1347,6 +1347,7 @@ h2,
   transform: translate(-50%, -50%);
   transition: width .15s ease, height .15s ease, background .15s ease, border .15s ease;
   mix-blend-mode: difference;
+  will-change: transform, width, height;
 }
 
 @media (hover: hover) and (pointer: fine) {
