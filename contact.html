@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact | EpicEdge Media</title>
   <meta name="description" content="Contact EpicEdge Media in Dubai, UAE for creative production, photography, videography, events, content creation, and digital marketing inquiries.">
-  <link rel="canonical" href="https://epicedgeme.com/">
+  <link rel="canonical" href="https://epicedgeme.com/contact.html">
   <meta property="og:title" content="EpicEdge Media | Creative Media Agency UAE">
   <meta property="og:description" content="EpicEdge Media is a UAE-based creative media company for photography, videography, event coverage, corporate content, social media, and digital marketing.">
   <meta property="og:image" content="https://epicedgeme.com/assets/images/portfolio.jpg">
@@ -156,20 +156,32 @@
       const msg = this.querySelector(".form-message");
       btn.textContent = "Sending...";
       btn.disabled = true;
+      msg.textContent = "";
+      msg.classList.remove("show", "error");
 
-      fetch("https://script.google.com/macros/s/AKfycbyaSpvHIOI1bHuYhXlRVVLzk6JLxtpZecSFWhM2r8YAYIt60n1inUgfvnlT0hGuw7Bo/exec", {
+      fetch("/submit-contact", {
         method: "POST",
-        mode: "no-cors",
         body: new FormData(this)
       })
-      .then(() => {
-        msg.style.color = "#4ade80";
-        msg.textContent = "✓ Message sent! We'll be in touch within 24 hours.";
-        this.reset();
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "An unknown error occurred.");
+        }
+        return data;
       })
-      .catch(() => {
-        msg.style.color = "#C92940";
+      .then((data) => {
+        if (data.message) {
+          msg.textContent = "✓ " + data.message + " We'll be in touch within 24 hours.";
+          msg.classList.add("show");
+          this.reset();
+        } else {
+          throw new Error("An unknown error occurred.");
+        }
+      })
+      .catch((error) => {
         msg.textContent = "Something went wrong. Please try WhatsApp or email us directly.";
+        msg.classList.add("show", "error");
       })
       .finally(() => {
         btn.textContent = "Send Enquiry →";
@@ -206,7 +218,7 @@
       <div><h3 class="footer-heading">Quick Links</h3><div class="footer-links"><a href="index.html">Home</a><a href="services.html">Services</a><a href="portfolio.html">Portfolio</a><a href="contact.html">Contact</a></div></div>
       <div><h3 class="footer-heading">Contact</h3><div class="footer-contact"><a href="tel:+971563153059">+971 56 315 3059</a><a href="mailto:info@epicedgeme.com">info@epicedgeme.com</a><a class="btn btn-outline" href="https://wa.me/971563153059?text=Hi%20EpicEdge%20Media%2C%20I%20am%20interested%20in%20your%20services." target="_blank" rel="noreferrer">WhatsApp</a></div></div>
     </div>
-    <div class="footer-bottom">&copy; 2026 EpicEdge Media. All rights reserved. | UAE</div>
+    <div class="footer-bottom">&copy; 2024 EpicEdge Media. All rights reserved. | UAE</div>
   </footer>
 
   <a href="https://wa.me/971563153059?text=Hi%20EpicEdge%20Media%2C%20I%20am%20interested%20in%20your%20services." class="whatsapp-float" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">
@@ -216,3 +228,4 @@
   <script src="js/main.js" defer></script>
 </body>
 </html>
+
