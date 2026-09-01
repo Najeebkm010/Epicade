@@ -15,10 +15,11 @@ const htmlFile = (fileName) => path.join(rootDir, fileName);
 const sessionSecret = process.env.SESSION_SECRET || crypto.createHash('sha256')
     .update(`${process.env.ADMIN_PASSWORD || 'change-me'}:epicedge-admin-session`)
     .digest('hex');
+const cloudinaryCloudName = (process.env.CLOUDINARY_CLOUD_NAME || '').trim().replace(/^@/, '');
 const cloudinaryConfigured = Boolean(
-    process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
+    cloudinaryCloudName &&
+    process.env.CLOUDINARY_API_KEY?.trim() &&
+    process.env.CLOUDINARY_API_SECRET?.trim()
 );
 
 // --- Middleware Setup ---
@@ -141,16 +142,19 @@ const uploadToCloudinary = async (file, slot) => {
     Object.entries(params).forEach(([key, value]) => form.append(key, value));
     form.append('signature', cloudinarySignature(params));
 
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`, {
         method: 'POST',
         body: form
     });
-    if (!response.ok) throw new Error(`Cloudinary upload failed (${response.status})`);
+    if (!response.ok) {
+        const details = await response.json().catch(() => ({}));
+        throw new Error(details.error?.message || `Cloudinary upload failed (${response.status})`);
+    }
     return response.json();
 };
 
 const portfolioImageUrl = (slot) => cloudinaryConfigured
-    ? `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/portfolio/${slot}.jpg`
+    ? `https://res.cloudinary.com/${cloudinaryCloudName}/image/upload/f_auto,q_auto/portfolio/${slot}.jpg`
     : `/assets/images/ourwork/${slot}.jpg`;
 
 app.get('/api/portfolio', (req, res) => {
@@ -163,6 +167,10 @@ const uploadFields = Array.from({ length: 9 }, (_, i) => ({ name: `image${i + 1}
 app.post('/upload-portfolio', isAuthenticated, upload.fields(uploadFields), async (req, res) => {
     try {
         const files = Object.entries(req.files || {});
+        if (!files.length) return res.status(400).send('<h1>Upload Failed</h1><p>Please select at least one JPEG image.</p><p><a href="/admin">Go back</a></p>');
+        if (!cloudinaryConfigured && process.env.VERCEL) {
+            return res.status(500).send('<h1>Upload Failed</h1><p>Cloudinary is not configured in Vercel. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Project Settings, then redeploy.</p><p><a href="/admin">Go back</a></p>');
+        }
         if (cloudinaryConfigured) {
             await Promise.all(files.map(([field, fileList]) => uploadToCloudinary(fileList[0], field.replace('image', ''))));
         } else {
@@ -171,7 +179,8 @@ app.post('/upload-portfolio', isAuthenticated, upload.fields(uploadFields), asyn
         res.send('<h1>Upload Successful!</h1><p>Your portfolio images have been updated. <a href="/admin">Go back</a> or <a href="/portfolio" target="_blank">view portfolio</a>.</p>');
     } catch (error) {
         console.error('Portfolio upload failed:', error);
-        res.status(502).send('<h1>Upload Failed</h1><p>Could not save the images. Check the storage settings and try again.</p><p><a href="/admin">Go back</a></p>');
+        const message = String(error.message || '').replace(/[<>]/g, '');
+        res.status(502).send(`<h1>Upload Failed</h1><p>${message || 'Could not save the images. Check the storage settings and try again.'}</p><p><a href="/admin">Go back</a></p>`);
     }
 });
 
