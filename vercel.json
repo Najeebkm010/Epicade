@@ -1,15 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/admin", "destination": "/api?route=admin" },
-    { "source": "/admin.html", "destination": "/api?route=admin.html" },
-    { "source": "/login", "destination": "/api?route=login" },
-    { "source": "/logout", "destination": "/api?route=logout" },
-    { "source": "/upload-portfolio", "destination": "/api?route=upload-portfolio" },
-    { "source": "/submit-contact", "destination": "/api?route=submit-contact" },
-    { "source": "/api/portfolio", "destination": "/api?route=api/portfolio" },
-    { "source": "/services", "destination": "/api?route=services" },
-    { "source": "/portfolio", "destination": "/api?route=portfolio" },
-    { "source": "/contact", "destination": "/api?route=contact" },
-    { "source": "/", "destination": "/api?route=home" }
+    { "source": "/(.*)", "destination": "/api" }
   ]
 }
