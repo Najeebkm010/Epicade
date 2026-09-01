@@ -1,5 +1,15 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index.js" }
+    { "source": "/admin", "destination": "/api/index.js?route=admin" },
+    { "source": "/admin.html", "destination": "/api/index.js?route=admin.html" },
+    { "source": "/login", "destination": "/api/index.js?route=login" },
+    { "source": "/logout", "destination": "/api/index.js?route=logout" },
+    { "source": "/upload-portfolio", "destination": "/api/index.js?route=upload-portfolio" },
+    { "source": "/submit-contact", "destination": "/api/index.js?route=submit-contact" },
+    { "source": "/api/portfolio", "destination": "/api/index.js?route=api/portfolio" },
+    { "source": "/services", "destination": "/api/index.js?route=services" },
+    { "source": "/portfolio", "destination": "/api/index.js?route=portfolio" },
+    { "source": "/contact", "destination": "/api/index.js?route=contact" },
+    { "source": "/", "destination": "/api/index.js?route=home" }
   ]
 }
