@@ -111,7 +111,7 @@
           </div>
         </aside>
 
-    <form class="contact-form reveal" id="contactForm" novalidate>
+    <form class="contact-form reveal" id="contactForm" action="/submit-contact" method="post" enctype="multipart/form-data" novalidate>
       <div class="form-row">
         <div class="field">
           <label>Full Name</label>
@@ -180,7 +180,7 @@
         }
       })
       .catch((error) => {
-        msg.textContent = "Something went wrong. Please try WhatsApp or email us directly.";
+        msg.textContent = error?.message || "Something went wrong. Please try WhatsApp or email us directly.";
         msg.classList.add("show", "error");
       })
       .finally(() => {

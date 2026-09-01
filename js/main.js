@@ -1,5 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
+
+  // Portfolio slots can be replaced from the admin portal without rebuilding the site.
+  const loadPortfolioImages = async () => {
+    const images = Array.from(document.querySelectorAll('img[src*="/assets/images/ourwork/"]'));
+    if (!images.length) return;
+    try {
+      const response = await fetch('/api/portfolio');
+      if (!response.ok) return;
+      const data = await response.json();
+      images.forEach((image) => {
+        const match = image.src.match(/ourwork\/(\d+)\.jpg/);
+        const slot = match ? Number(match[1]) : 0;
+        if (slot && data.images?.[slot - 1]) image.src = `${data.images[slot - 1]}?v=${Date.now()}`;
+      });
+    } catch (error) {
+      console.warn('Portfolio images could not be refreshed:', error);
+    }
+  };
+  loadPortfolioImages();
+
   const header = document.querySelector(".site-header");
   const menuToggle = document.querySelector(".menu-toggle");
   const mobileMenu = document.querySelector(".mobile-menu");
