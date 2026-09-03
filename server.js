@@ -256,7 +256,7 @@ app.use('/assets', express.static(assetsDir));
 app.use('/css', express.static(cssDir));
 app.use('/js', express.static(jsDir));
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
     if (err && err.message === 'Only JPEG images are allowed.') {
         return res.status(400).send('<h1>Upload Failed</h1><p>Please upload JPEG images only.</p><p><a href="/admin">Go back</a></p>');
     }
