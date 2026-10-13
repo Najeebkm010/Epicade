@@ -1,6 +1,46 @@
 {
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/services",
+      "destination": "/services.html",
+      "permanent": true
+    },
+    {
+      "source": "/services/",
+      "destination": "/services.html",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/portfolio.html",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/",
+      "destination": "/portfolio.html",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html",
+      "permanent": true
+    },
+    {
+      "source": "/contact/",
+      "destination": "/contact.html",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index.js" }
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
   ],
   "functions": {
     "api/index.js": {
