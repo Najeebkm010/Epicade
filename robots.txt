@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://epicedgeme.com/sitemap.xml
+
+Sitemap: https://www.epicedgeme.com/sitemap.xml
